@@ -1,14 +1,13 @@
-import {useState} from "react";
+import React from 'react'
 
+type CategoriesProps = {
+    value: number
+    onClickCategory: (index: number) => void
+}
 
-function Categories({value, onClickCategory}) {
-    const [activeIndex, setActiveIndex] = useState(0);
+const Categories: React.FC<CategoriesProps> = React.memo(({value, onClickCategory}) => {
 
     const categoriesList = ["Все", "Мясные", "Вегетарианские", "Гриль", "Острые", "Закрытые"]
-
-    // const onClickCategory = (index) => {
-    //     setActiveIndex(index)
-    // }
 
     return (
         <div className="categories">
@@ -18,6 +17,6 @@ function Categories({value, onClickCategory}) {
             </ul>
         </div>
     )
-}
+})
 
 export default Categories

@@ -1,4 +1,3 @@
-import React, {useState} from "react";
 import './App.css';
 import '../src/scss/app.scss'
 import Header from "./components/Header";
@@ -10,14 +9,10 @@ import PizzaInfo from "./pages/PizzaInfo";
 
 
 
-// export const MyContext = React.createContext();
-
 function App() {
-    // const [searchValue, setSearchValue] = useState('');
 
     return (
         <div className="wrapper">
-            {/*<MyContext.Provider value={{searchValue, setSearchValue}}>*/}
                 <Header/>
                 <div className="content">
                     <div className="container">
@@ -29,7 +24,6 @@ function App() {
                         </Routes>
                     </div>
                 </div>
-            {/*</MyContext.Provider>*/}
         </div>
     );
 }

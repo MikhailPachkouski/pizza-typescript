@@ -2,9 +2,14 @@ import React from 'react';
 import ReactPaginate from "react-paginate";
 import styles from '../scss/Pagination.module.scss'
 import {useSelector} from "react-redux";
+import {RootState} from "../redux/store";
 
-const Pagination = ({onChangePage}) => {
-    const currentPage = useSelector(state => state.filter.currentPage)
+type PaginationProps = {
+    onChangePage: (page: number) => void
+}
+
+const Pagination :React.FC<PaginationProps> = ({onChangePage}) => {
+    const currentPage = useSelector((state: RootState) => state.filter.currentPage)
 
     return (
         <ReactPaginate
@@ -16,7 +21,6 @@ const Pagination = ({onChangePage}) => {
             pageCount={3}
             forcePage={currentPage - 1}
             previousLabel="<"
-            renderOnZeroPageCount={null}
         />
     );
 };

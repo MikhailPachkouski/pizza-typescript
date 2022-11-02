@@ -1,36 +1,47 @@
+import React from 'react'
 import {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilterSelectedSort, setSelectedSort} from "../redux/slices/filterSlice";
-import {logDOM} from "@testing-library/react";
+import {selectFilterSelectedSort, setSelectedSort, SortList, SortType} from "../redux/slices/filterSlice";
 
-export const typeSort = [
-    {name: 'популярности', sortValue: 'rating'},
-    {name: 'цене', sortValue: 'price'},
-    {name: 'алфавиту', sortValue: 'title'}
+type SortItem =
+    {
+        name: string
+        sortValue: string
+    }
+
+type PopUpClick = MouseEvent & {
+    path: Node[]
+}
+
+export const typeSort: SortType[] = [
+    {name: 'популярности', sortValue: SortList.RATING},
+    {name: 'цене', sortValue: SortList.PRICE},
+    {name: 'алфавиту', sortValue: SortList.TITLE}
 ]
 
-function Sort() {
+const Sort: React.FC = React.memo(() => {
     const [openPopup, setOpenPopup] = useState(false);
 
     const selectedSort = useSelector(selectFilterSelectedSort)
     const dispatch = useDispatch()
 
-    const sortRef = useRef()
+    const sortRef = useRef<HTMLDivElement>(null)
 
     // const typeSort = ['популярности', 'цене', 'алфавиту']
-    const switchSort = (type) => {
+    const switchSort = (type: SortType) => {
         dispatch(setSelectedSort(type))
         setOpenPopup(false)
     }
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (!event.path.includes(sortRef.current)) {
+        const handleClickOutside = (event: MouseEvent) => {
+            const _event = event as PopUpClick
+            if (sortRef.current && !_event.path.includes(sortRef.current)) {
                 setOpenPopup(false)
             }
         }
 
-            document.body.addEventListener('click', handleClickOutside)
+        document.body.addEventListener('click', handleClickOutside)
         return () => document.body.removeEventListener('click', handleClickOutside)
     }, [])
 
@@ -63,6 +74,6 @@ function Sort() {
             )}
         </div>
     )
-}
+})
 
 export default Sort

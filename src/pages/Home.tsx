@@ -1,22 +1,30 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import Categories from "../components/Categories";
 import Sort from "../components/Sort";
 import Skeleton from "../components/Skeleton";
 import PizzaBlock from "../components/PizzaBlock";
 import Pagination from "../components/Pagination";
 import {useDispatch, useSelector} from "react-redux";
-import {selectFilter, setCategoryId, setCurrentPage, setFilters} from '../redux/slices/filterSlice'
+import FilterSlice, {
+    FilterSliceState,
+    selectFilter,
+    setCategoryId,
+    setCurrentPage,
+    setFilters,
+    SortType
+} from '../redux/slices/filterSlice'
 import qs from 'qs'
 import {useNavigate} from "react-router-dom";
 import {typeSort} from '../components/Sort'
 import {fetchPizzas, selectPizza} from "../redux/slices/pizzaSlice";
+import {useAppDispatch} from "../redux/store";
 
 
-const Home = () => {
+const Home: React.FC = () => {
 
     const {categoryId, selectedSort, currentPage, searchValue} = useSelector(selectFilter)
     const {items, status} = useSelector(selectPizza)
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
 
     const isSearch = useRef(false)
@@ -44,12 +52,13 @@ const Home = () => {
         //         setIsLoading(false)
         //     })
 
-        dispatch(fetchPizzas({
-            currentPage,
-            categoryURL,
-            sortURL,
-            search
-        }))
+        dispatch(
+            fetchPizzas({
+                currentPage: String(currentPage),
+                categoryURL,
+                sortURL,
+                search
+            }))
     }
 
     useEffect(() => {
@@ -71,10 +80,12 @@ const Home = () => {
             const paramsSearch = qs.parse(window.location.search.substring(1))
             const paramsSort = typeSort.find((el) => el.sortValue === paramsSearch.selectedSort)
 
-            dispatch(setFilters({
+            const allParamsSearch = {
                 ...paramsSearch,
                 selectedSort: paramsSort
-            }))
+            } as FilterSliceState
+
+            dispatch(setFilters(allParamsSearch))
             isSearch.current = true
         }
     }, [])
@@ -95,9 +106,9 @@ const Home = () => {
     }, [categoryId, selectedSort, searchValue, currentPage]);
 
 
-    const onClickCategoryHandler = (id) => {
+    const onClickCategoryHandler = useCallback((id: number) => {
         dispatch(setCategoryId(id))
-    }
+    }, [])
 
     return (
         <>
@@ -124,7 +135,7 @@ const Home = () => {
                             }
                         </div>
                     )}
-            <Pagination onChangePage={(number) => dispatch(setCurrentPage(number))}/>
+            <Pagination onChangePage={(page: number) => dispatch(setCurrentPage(page))}/>
         </>
     );
 };

@@ -3,24 +3,24 @@ import React, {useCallback, useContext, useRef, useState} from 'react';
 import styles from '../scss/Search.module.scss'
 
 import closeIcon from '../assets/img/close_round_icon.svg'
-import {MyContext} from "../App";
 import debounce from 'lodash.debounce'
 import {selectFilter, setSearchValue} from "../redux/slices/filterSlice";
 import {useDispatch, useSelector} from "react-redux";
 
-const Search = () => {
+const Search: React.FC = () => {
     const [localSearchValue, setLocalSearchValue] = useState('');
     // const {searchValue, setSearchValue} = useContext(MyContext)
-    const inputRef = useRef()
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const {searchValue} = useSelector(selectFilter)
     const dispatch = useDispatch()
 
-    const updateSearchValue = useCallback(debounce((str) => {
-        dispatch(setSearchValue(str))
-    },1000),[])
+    const updateSearchValue = useCallback(
+        debounce((str: string) => {
+            dispatch(setSearchValue(str))
+        }, 1000), [])
 
-    const onChangeInput = (event) => {
+    const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLocalSearchValue(event.target.value)
         updateSearchValue(event.target.value)
     }
@@ -28,7 +28,7 @@ const Search = () => {
     const onClear = () => {
         setLocalSearchValue('')
         dispatch(setSearchValue(''))
-        inputRef.current.focus()
+        inputRef.current?.focus()
     }
 
     return (
@@ -46,13 +46,14 @@ const Search = () => {
                         fill="#333333"/>
                 </g>
             </svg>
-            <input ref={inputRef} value={localSearchValue} type="text" className={styles.input} placeholder='Поиск пиццы...'
-            onChange={(event) => onChangeInput(event)}/>
+            <input ref={inputRef} value={localSearchValue} type="text" className={styles.input}
+                   placeholder='Поиск пиццы...'
+                   onChange={(event) => onChangeInput(event)}/>
             {searchValue && (
                 <img className={styles.closeIcon} src={closeIcon} onClick={onClear} alt='Close'/>
             )}
         </div>
-);
+    );
 };
 
 export default Search;

@@ -6,7 +6,7 @@ import {clearItems, selectCart} from "../redux/slices/cartSlice";
 import CartEmpty from "../components/CartEmpty";
 
 
-const Cart = () => {
+const Cart: React.FC = () => {
     const dispatch = useDispatch()
     const { totalPrice, items} = useSelector(selectCart)
 
@@ -57,8 +57,8 @@ const Cart = () => {
             </div>
             <div className="cart__bottom">
                 <div className="cart__bottom-details">
-                    <span> Всего пицц: <b>{items.reduce((number, item) => item.count + number, 0)} шт.</b> </span>
-                    <span> Сумма заказа: <b>{items.reduce((sum, item) => item.count * item.price + sum, 0)} ₽</b> </span>
+                    <span> Всего пицц: <b>{items.reduce((number: number, item: any) => item.count + number, 0)} шт.</b> </span>
+                    <span> Сумма заказа: <b>{items.reduce((sum: number, item: any) => item.count * item.price + sum, 0)} ₽</b> </span>
                 </div>
                 <div className="cart__bottom-buttons">
                     <Link to="/" className="button button--outline button--add go-back-btn">

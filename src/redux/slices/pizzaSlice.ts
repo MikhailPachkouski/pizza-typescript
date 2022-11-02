@@ -1,8 +1,11 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import axios from "axios";
 import {createAsyncThunk} from "@reduxjs/toolkit";
+import {RootState} from "../store";
 
-export const fetchPizzas = createAsyncThunk(
+type FetchPizzasType = Record<string, string>
+
+export const fetchPizzas = createAsyncThunk<PizzaType[], FetchPizzasType>(
     'pizza/fetchPizzaById',
     async (params) => {
         const {
@@ -11,43 +14,76 @@ export const fetchPizzas = createAsyncThunk(
             sortURL,
             search
         } = params
-        const {data} = await axios.get(`https://633dc3e1f2b0e623dc7af0ee.mockapi.io/items?page=${currentPage}&limit=5${categoryURL}&${sortURL}${search}`)
+        const {data} = await axios.get<PizzaType[]>(`https://633dc3e1f2b0e623dc7af0ee.mockapi.io/items?page=${currentPage}&limit=5${categoryURL}&${sortURL}${search}`)
 
         return data
     }
 )
 
-const initialState = {
+type PizzaType = {
+    id: string,
+    title: string,
+    price: number,
+    imageUrl: string,
+    sizes: number[],
+    types: number[]
+}
+
+enum StatusEnum {
+    LOADING = 'loading',
+    SUCCESS = 'success',
+    ERROR = 'error'
+}
+
+interface PizzaSliceState {
+    items: PizzaType[],
+    status: StatusEnum
+}
+
+const initialState: PizzaSliceState = {
     items: [],
-    status: ''
+    status: StatusEnum.LOADING
 }
 export const pizzaSlice = createSlice({
     name: 'pizza',
     initialState,
     reducers: {
-        setItems(state, action) {
+        setItems(state, action: PayloadAction<PizzaType[]>) {
             state.items = action.payload
         }
 
     },
-    extraReducers: {
-        [fetchPizzas.pending]: (state, action) => {
-            state.status = 'loading'
+    extraReducers: (builder) => {
+        builder.addCase(fetchPizzas.pending, (state, action) => {
+            state.status = StatusEnum.LOADING
             state.items = []
-        },
-        [fetchPizzas.fulfilled]: (state, action) => {
+        })
+        builder.addCase(fetchPizzas.fulfilled, (state, action) => {
             state.items = action.payload
-            state.status = 'success'
-        },
-        [fetchPizzas.rejected]: (state, action) => {
-            state.status = 'error'
+            state.status = StatusEnum.SUCCESS
+        })
+        builder.addCase(fetchPizzas.rejected, (state, action) => {
+            state.status = StatusEnum.ERROR
             state.items = []
-        },
-
+        })
     }
+    // [fetchPizzas.pending]: (state, action) => {
+    //     state.status = 'loading'
+    //     state.items = []
+    // },
+    // [fetchPizzas.fulfilled]: (state, action) => {
+    //     state.items = action.payload
+    //     state.status = 'success'
+    // },
+    // [fetchPizzas.rejected]: (state, action) => {
+    //     state.status = 'error'
+    //     state.items = []
+    // },
+
+
 })
 
-export const selectPizza = state => state.pizza
+export const selectPizza = (state: RootState) => state.pizza
 
 export const {setItems} = pizzaSlice.actions
 export default pizzaSlice.reducer
